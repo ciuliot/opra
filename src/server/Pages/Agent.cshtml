@@ -1,0 +1,27 @@
+﻿@page
+@model AgentModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width,initial-scale=1'>
+
+	<title>Svelte app</title>
+
+	<link rel='icon' type='image/png' href='/favicon.png'>
+  <link rel='stylesheet' href='/build/bundle.css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <environment names="Development">
+    <script defer src="~/build/agent.js"></script>
+    <link rel="stylesheet" href="~/build/agent.css" />
+  </environment>
+  <environment names="Production">
+    <script defer src="~/build/agent-@(Model.PackageVersion)-min.js"></script>
+    <link rel="stylesheet" href="~/build/agent-@(Model.PackageVersion).css" />
+  </environment>
+</head>
+
+<body>
+</body>
+</html>
