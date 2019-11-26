@@ -1,5 +1,5 @@
 ﻿@page
-@model AgentModel
+@model KioskDesktopModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,12 +12,12 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <environment names="Development">
-    <script defer src="~/build/agent.js"></script>
-    <link rel="stylesheet" href="~/build/agent.css" />
+    <script defer src="~/build/kiosk-desktop.js"></script>
+    <link rel="stylesheet" href="~/build/kiosk-desktop.css" />
   </environment>
   <environment names="Production">
-    <script defer src="~/build/agent-@(Model.PackageVersion)-min.js"></script>
-    <link rel="stylesheet" href="~/build/agent-@(Model.PackageVersion).css" />
+    <script defer src="~/build/kiosk-desktop-@(Model.PackageVersion)-min.js"></script>
+    <link rel="stylesheet" href="~/build/kiosk-desktop-@(Model.PackageVersion).css" />
   </environment>
 </head>
 

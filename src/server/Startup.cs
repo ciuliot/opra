@@ -9,18 +9,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
+using OP.RemoteAdvisor.Hubs;
 using StackExchange.Redis;
 
 namespace OP.RemoteAdvisor
 {
   public class Startup
   {
-    public Startup(IConfiguration configuration)
-    {
-      Configuration = configuration;
-    }
-
     public IConfiguration Configuration { get; }
+
+    public Startup(IConfiguration configuration) => Configuration = configuration;
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -31,13 +29,14 @@ namespace OP.RemoteAdvisor
       });
       services.AddRazorPages().AddRazorPagesOptions(options =>
       {
-        options.Conventions.AddPageRoute("/Agent", "/agent/call/{section}");
+        options.Conventions.AddPageRoute("/KioskDesktop", "/kiosk-desktop");
+        options.Conventions.AddPageRoute("/KioskTablet", "/kiosk-tablet");
 
       });
+      services.AddSingleton<IUserIdProvider, UserIdProvider>();
       services.AddSignalR();    
 
-      var redisConnectionString =
-            Configuration.GetConnectionString("RedisConnection");
+      var redisConnectionString = Configuration.GetConnectionString("RedisConnection");
 
       services.AddDistributedRedisCache(options =>
       {
@@ -78,6 +77,7 @@ namespace OP.RemoteAdvisor
 
       app.UseHttpsRedirection();
       var rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "public");
+      
       app.UseStaticFiles(new StaticFileOptions
       {
         FileProvider = new PhysicalFileProvider(rootFolder)
@@ -90,6 +90,9 @@ namespace OP.RemoteAdvisor
       {
         endpoints.MapRazorPages();
         endpoints.MapControllers();
+
+        endpoints.MapHub<CallQueueHub>("/callQueue");
+        endpoints.MapHub<CallSessionHub>("/callSession");
       });
     }
   }

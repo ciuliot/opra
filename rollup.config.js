@@ -2,69 +2,63 @@ import svelte from "rollup-plugin-svelte";
 import resolve from "rollup-plugin-node-resolve";
 import commonjs from "rollup-plugin-commonjs";
 import jsonPlugin from "rollup-plugin-json";
-import livereload from "rollup-plugin-livereload";
 import { terser } from "rollup-plugin-terser";
 import postcss from "rollup-plugin-postcss";
 
 const production = !process.env.ROLLUP_WATCH;
 
-const agentConfig = {
-  input: "src/agent/main.js",
-  output: {
-    sourcemap: true,
-    format: "iife",
-    name: "app",
-    file: "public/build/agent.js"
-  },
-  plugins: [
-    postcss({
-      extensions: [".css"]
-    }),
-    jsonPlugin(),
-    svelte({
-      // enable run-time checks when not in production
-      dev: !production,
-      // we'll extract any component CSS out into
-      // a separate file — better for performance
-      css: css => {
-        css.write("public/build/agent.css");
-      }
-    }),
-
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration —
-    // consult the documentation for details:
-    // https://github.com/rollup/rollup-plugin-commonjs
-    resolve({
-      browser: true,
-      dedupe: importee =>
-        importee === "svelte" || importee.startsWith("svelte/")
-    }),
-    commonjs(),    
-
-    // In dev mode, call `npm run start` once
-    // the bundle has been generated
-    !production && serve(),
-
-    // Watch the `public` directory and refresh the
-    // browser on changes when not in production
-    !production && livereload("public"),
-
-    // If we're building for production (npm run build
-    // instead of npm run dev), minify
-    production && terser()
-  ],
-  watch: {
-    chokidar: false,
-    clearScreen: false,
-    include: 'src/**',
-    exclude: 'node_modules/**'
-  }
-};
+function generateConfig(part) {
+  return {
+    input: `src/${part}/main.js`,
+    output: {
+      sourcemap: true,
+      format: "iife",
+      name: "app",
+      file: `public/build/${part}.js`
+    },
+    plugins: [
+      postcss({
+        extensions: [".css"]
+      }),
+      jsonPlugin(),
+      svelte({
+        // enable run-time checks when not in production
+        dev: !production,
+        // we'll extract any component CSS out into
+        // a separate file — better for performance
+        css: css => {
+          css.write(`public/build/${part}.css`);
+        }
+      }),
+  
+      // If you have external dependencies installed from
+      // npm, you'll most likely need these plugins. In
+      // some cases you'll need additional configuration —
+      // consult the documentation for details:
+      // https://github.com/rollup/rollup-plugin-commonjs
+      resolve({
+        browser: true,
+        dedupe: importee =>
+          importee === "svelte" || importee.startsWith("svelte/")
+      }),
+      commonjs(),    
+  
+      // If we're building for production (npm run build
+      // instead of npm run dev), minify
+      production && terser()
+    ],
+    watch: {
+      chokidar: false,
+      clearScreen: false,
+      include: [`src/${part}/**`, 'src/shared/**'],
+      exclude: 'node_modules/**'
+    }
+  };
+}
 
 export default [
-  agentConfig
+  generateConfig('agent'),
+  generateConfig('kiosk-desktop'),
 ];
 
 function serve() {
